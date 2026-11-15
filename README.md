@@ -1,12 +1,19 @@
 # Machine Hunter HD
 
+**[Italiano](#italiano) | [English](#english)**
+
+---
+
+<a name="italiano"></a>
+## Italiano
+
 Mod non ufficiale per **Machine Hunter** (PC, 1997, versione 1.10): alta risoluzione, schermi larghi fino a 32:9, texture e sprite HD, menu e HUD ridisegnati, joypad, musica dal CD e varie correzioni.
 
-*English summary below.*
+> Il repository contiene **solo il codice e gli strumenti del mod**. Non contiene file del gioco originale, né musica, né texture. Ognuno si genera le texture HD, i menu HD e la musica dalla **propria copia** del gioco con `tools\installa.py`.
 
-> Il repository contiene **solo il codice e gli strumenti del mod**. Non contiene file del gioco originale, né musica, né texture: tutto viene generato dalla **propria copia** del gioco con `tools\installa.py`.
+> ⚠️ **Compatibilità:** il mod è stato provato **solo con la versione italiana** del gioco (`MACHHUNT.EXE` v1.10, MD5 `e651c3d6a3658aa47fc647621876acae`). Non si sa se funziona con altre versioni o lingue. `installa.py` controlla l'EXE e si ferma se non corrisponde nei punti da modificare.
 
-## Cosa fa
+### Cosa fa
 
 **Grafica**
 - Risoluzione interna 4x (960 righe) e rapporto d'aspetto libero: auto, 16:9, 21:9, 32:9, 16:10, 4:3 o un numero. A schermo intero senza bordi o in finestra.
@@ -44,7 +51,7 @@ Mod non ufficiale per **Machine Hunter** (PC, 1997, versione 1.10): alta risoluz
 
 Tutte le opzioni sono in `MHFIX.INI`, commentate.
 
-## Installazione
+### Installazione
 
 Serve il gioco **Machine Hunter** installato dal CD originale: cartella con `MACHHUNT.EXE` (v1.10) e `DATA\DATA.ARC`.
 
@@ -65,7 +72,7 @@ Serve il gioco **Machine Hunter** installato dal CD originale: cartella con `MAC
    - `--senza-musica` per saltare la musica;
    - `--solo-exe` per rifare solo l'EXE.
 
-   Ci vogliono alcuni minuti, soprattutto per Real-ESRGAN, e circa 1,5 GB di spazio.
+   Ci vogliono circa 15-20 minuti, soprattutto per Real-ESRGAN, e circa 1,5 GB di spazio.
 5. Metti `WINMX.dll` (dalla [release](../../releases), oppure compilala, vedi sotto) nella cartella del gioco.
 6. Avvia **`MACHHUNT_HD.EXE`**. Nella finestra "Machine Hunter V 1.10" premi *Nuova partita*.
 
@@ -78,7 +85,13 @@ Serve il gioco **Machine Hunter** installato dal CD originale: cartella con `MAC
 
 Ogni passo si può lanciare anche a mano: vedi la descrizione in cima a ogni script.
 
-## Compilare WINMX.dll
+**Texture proprie:** dopo il passo 3 le texture HD sono normali PNG in `TEXTURES_4X\` e `SPRITES_4X\`. Si possono ritoccare o sostituire con le proprie e poi ricostruire l'archivio:
+```bash
+python tools/mh_tex.py build TEXTURES_4X SPRITES_4X
+python tools/png_index.py
+```
+
+### Compilare WINMX.dll
 
 `WINMX.dll` sostituisce `WINMM.dll` per l'EXE patchato. È a 32 bit e si compila con clang o gcc mingw-w64 (i686):
 
@@ -87,7 +100,7 @@ cd tools/winmx
 i686-w64-mingw32-clang -O2 -shared -o WINMX.dll winmx.c -lsetupapi -lhid -lgdi32 -luser32 -lopengl32 -lwindowscodecs -lole32 -luuid -Wl,--kill-at
 ```
 
-## File
+### File
 
 | File | Cosa fa |
 |---|---|
@@ -101,46 +114,138 @@ i686-w64-mingw32-clang -O2 -shared -o WINMX.dll winmx.c -lsetupapi -lhid -lgdi32
 | `tools/installa.py` | tutto in un comando |
 | `MHFIX.INI` | impostazioni del mod |
 
-## Note
+### Note
 
 - Mod amatoriale, non affiliato con gli autori o i detentori dei diritti di Machine Hunter.
 - Le immagini delle missioni si possono rifare con le proprie foto:
   1. in `MHFIX.INI` metti `[foto] anteprima=1`;
   2. in modalità foto scatta con F12.
+- I commenti nel codice e in `MHFIX.INI` sono in italiano.
+
+### Licenza
+
+Codice del mod sotto licenza MIT (vedi `LICENSE`). Machine Hunter e i suoi contenuti appartengono ai rispettivi proprietari.
 
 ---
 
-## English summary
+<a name="english"></a>
+## English
 
-Unofficial mod for **Machine Hunter** (PC, 1997, v1.10).
+Unofficial mod for **Machine Hunter** (PC, 1997, version 1.10): high resolution, widescreen up to 32:9, HD textures and sprites, redrawn menus and HUD, gamepad, CD music and various fixes.
 
-- **Graphics:**
-  - 4x internal resolution and any aspect ratio up to 32:9;
-  - a new OpenGL renderer with true colour, perspective-correct texturing and HD textures and sprites (Real-ESRGAN);
-  - fixes for the tilted or rotating camera.
-- **Menus and HUD:** HD menus, HUD, fonts and logo; a widescreen menu and map.
-- **Gameplay:**
-  - gamepad support and CD music;
-  - enemy AI fixes (enemies no longer walk into crates);
-  - a photo mode.
+> This repository contains **only the mod's code and tools**. It contains no original game files, music or textures. Everyone generates the HD textures, HD menus and music from **their own copy** of the game with `tools\installa.py`.
 
-This repository contains **only the mod's code and tools**: no game files, music or textures. Everything is generated from your own copy of the game:
+> ⚠️ **Compatibility:** the mod has been tested **only with the Italian version** of the game (`MACHHUNT.EXE` v1.10, MD5 `e651c3d6a3658aa47fc647621876acae`). Other versions and languages are untested. `installa.py` checks the EXE and stops if it doesn't match at the patched locations.
 
-1. Install the requirements:
+### Features
+
+**Graphics**
+- 4x internal resolution (960 lines) and any aspect ratio: auto, 16:9, 21:9, 32:9, 16:10, 4:3 or a number. Borderless fullscreen or windowed.
+- New GPU renderer (OpenGL), with:
+  - 32-bit true colour and smooth lighting;
+  - perspective-correct texturing;
+  - the game's transparencies (additive and 50%);
+  - HD textures and sprites made with Real-ESRGAN, recoloured with each level's colours.
+- Improved classic renderer (256 colours) still available.
+- Fast HD texture loading: preloaded on several threads, with a loading screen ("CARICAMENTO TEXTURE HD") at the start of each level.
+- Graphics fixes:
+  - glitches with the tilted or rotating camera;
+  - map pieces disappearing at the sides;
+  - higher polygon limit.
+
+**Menus and HUD**
+- HD menus, HUD, fonts and logo, with adjustable HUD size.
+- The main menu and the door transition widen to the screen by rebuilding the sides, not by stretching.
+- Wide, high-resolution map (Select).
+- Left item column rearranged, with the glowing icons drawn transparent.
+
+**Gameplay**
+- Gamepad (XInput/HID) with configurable buttons and cross-to-confirm in menus.
+- Music from the CD tracks (`MUSIC\TrackNN.wav` or `.mp3`).
+- Enemy AI:
+  - enemies no longer push into crates and thin walls;
+  - patrols avoid blocked path segments.
+- Enemy spawn area widened for widescreen (can be turned off).
+- Player suit colour: purple (as on PS1), orange (as on PC) or others.
+- **Photo mode** (R3 / F10):
+  - free camera, rotation and zoom;
+  - frozen world;
+  - character shown or hidden;
+  - F12 / cross saves the picture to `FOTO\`.
+
+All options are in `MHFIX.INI`, with comments (in Italian).
+
+### Installation
+
+You need **Machine Hunter** installed from the original CD: a folder with `MACHHUNT.EXE` (v1.10) and `DATA\DATA.ARC`.
+
+1. **Python 3.10+** and the packages:
    ```bash
    pip install -r tools/requirements.txt
    ```
-2. Put Real-ESRGAN ncnn-vulkan in `tools/realesrgan/`.
-3. Copy `tools/` and `MHFIX.INI` into the game folder.
-4. Run:
+2. **Real-ESRGAN ncnn-vulkan** (needs a Vulkan graphics card):
+   - download `realesrgan-ncnn-vulkan-...-windows.zip` from [Real-ESRGAN releases](https://github.com/xinntao/Real-ESRGAN/releases);
+   - extract it into `tools\realesrgan\` (there must be `tools\realesrgan\realesrgan-ncnn-vulkan.exe` with the `models\` folder).
+3. Copy this repository's `tools\` folder and `MHFIX.INI` **into the game folder**.
+4. With the CD in the drive (for the music), from the game folder:
    ```bash
    python tools/installa.py
    ```
-5. Add `WINMX.dll` from the release.
-6. Start `MACHHUNT_HD.EXE`.
+   Options:
+   - `--cd E` to choose the drive;
+   - `--senza-musica` to skip the music;
+   - `--solo-exe` to rebuild only the EXE.
 
-Settings are in `MHFIX.INI`. Comments in the code and in the INI are in Italian.
+   It takes about 15-20 minutes, mostly for Real-ESRGAN, and about 1.5 GB of disk space.
+5. Put `WINMX.dll` (from the [release](../../releases), or build it, see below) in the game folder.
+6. Start **`MACHHUNT_HD.EXE`**. In the "Machine Hunter V 1.10" window, press *Nuova partita* (New game).
 
-## Licenza
+`installa.py` runs, in order:
+1. no-CD EXE;
+2. CD audio tracks;
+3. textures and sprites (export, Real-ESRGAN, fix for dark textures, `DATA\HD4S.ARC` archive, `DATA\HDPNG.idx` index);
+4. HD menus (`UI_HD\`), fonts, logo and wide doors;
+5. `MACHHUNT_HD.EXE` (patched by `build_exe.py`).
 
-Codice del mod sotto licenza MIT (vedi `LICENSE`). Machine Hunter e i suoi contenuti appartengono ai rispettivi proprietari.
+Each step can also be run by hand: see the description at the top of each script.
+
+**Your own textures:** after step 3 the HD textures are plain PNG files in `TEXTURES_4X\` and `SPRITES_4X\`. You can edit them or replace them with your own, then rebuild the archive:
+```bash
+python tools/mh_tex.py build TEXTURES_4X SPRITES_4X
+python tools/png_index.py
+```
+
+### Building WINMX.dll
+
+`WINMX.dll` replaces `WINMM.dll` for the patched EXE. It is 32-bit and builds with clang or gcc mingw-w64 (i686):
+
+```bash
+cd tools/winmx
+i686-w64-mingw32-clang -O2 -shared -o WINMX.dll winmx.c -lsetupapi -lhid -lgdi32 -luser32 -lopengl32 -lwindowscodecs -lole32 -luuid -Wl,--kill-at
+```
+
+### Files
+
+| File | What it does |
+|---|---|
+| `tools/winmx/` | the DLL: OpenGL presentation, new renderer, HD HUD/menus, gamepad, music, fixes (`winmx.c` + `*.inc`) |
+| `tools/build_exe.py` | EXE patch: resolution, 4x textures, separate HUD layer, hook to WINMX.dll |
+| `tools/mh_tex.py` | textures and sprites: export, Real-ESRGAN, archive rebuild |
+| `tools/png_index.py` | index of the HD PNGs for the new renderer |
+| `tools/rip_cd.py` | extracts the audio tracks from the CD (direct CDDA reading, no external programs) |
+| `tools/font_hd.py`, `make_logo.py`, `door_wide.py` | HD fonts, logo, wide menu doors |
+| `tools/mission_hd.py` | mission images from your own in-game photos (optional) |
+| `tools/installa.py` | everything in one command |
+| `MHFIX.INI` | mod settings |
+
+### Notes
+
+- Fan-made mod, not affiliated with the authors or rights holders of Machine Hunter.
+- You can remake the mission images from your own photos:
+  1. in `MHFIX.INI` set `[foto] anteprima=1`;
+  2. take the shot with F12 in photo mode.
+- Comments in the code and in `MHFIX.INI` are in Italian.
+
+### License
+
+Mod code under the MIT license (see `LICENSE`). Machine Hunter and its content belong to their respective owners.
