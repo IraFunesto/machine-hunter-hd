@@ -1,0 +1,6 @@
+numpy
+pillow
+scipy
+pefile
+keystone-engine
+capstone
