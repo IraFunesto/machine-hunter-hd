@@ -12,7 +12,7 @@ import sys, os, struct
 import pefile, keystone, capstone
 
 HERE = os.path.dirname(os.path.abspath(__file__)); GAME = os.path.dirname(HERE)
-SRC = os.path.join(GAME, 'MACHHUNT_NOCD4.EXE')
+SRC = os.environ.get('MH_SRC', os.path.join(GAME, 'MACHHUNT_NOCD4.EXE'))
 SPRHD = '--sprites' in sys.argv; args = [a for a in sys.argv[1:] if not a.startswith('--')]
 R = int(args[0]); T = int(args[1]); BW = int(args[2]) if len(args) > 2 else 560
 OUT = args[3] if len(args) > 3 else os.path.join(GAME, 'MACHHUNT_R%d_T%d%s.EXE' % (R, T, '_S' if SPRHD else ''))
@@ -27,8 +27,12 @@ def off(va): return pe.get_offset_from_rva(va-BASE)
 def dis(va): o = off(va); return next(md.disasm(bytes(b[o:o+15]), va))
 def put(va, bs): o = off(va); b[o:o+len(bs)] = bs
 def asm(src, va): return bytes(ks.asm(src, va)[0])
+# versione inglese (stessa 1.10, compilata dopo): alcune funzioni sono altrove. Riconosciuta dal thunk 0x4024ff -> 0x4209f0.
+_t = off(0x4024ff); EN = b[_t] == 0xE9 and 0x4024ff + 5 + struct.unpack('<i', bytes(b[_t+1:_t+5]))[0] == 0x4209f0
+ENMAP = {0x40711e: 0x420c2e, 0x407125: 0x420c35, 0x407140: 0x420c50, 0x407147: 0x420c57, 0x44f73b: 0x44f73d}
+def TR(va): return ENMAP.get(va, va) if EN else va
 def imm(va, old, new):
-    i = dis(va); o = off(va)
+    va = TR(va); i = dis(va); o = off(va)
     assert struct.unpack('<I', bytes(b[o+i.size-4:o+i.size]))[0] == old, (hex(va), i.op_str)
     b[o+i.size-4:o+i.size] = struct.pack('<I', new)
 def var(va, old, new):
@@ -318,7 +322,7 @@ FZn:
     # tipi: 1 = W, 2 = W/2, 3 = W-1, 4 = VW
     RS = []
     def rs_imm(va, kind):
-        i = dis(va); RS.append((va + i.size - 4, kind))
+        va = TR(va); i = dis(va); RS.append((va + i.size - 4, kind))
     def rs_find(start, size, val, kind, count=1):
         o0 = off(start); hits = [k for k in range(size - 3) if struct.unpack('<I', bytes(b[o0+k:o0+k+4]))[0] == val]
         assert len(hits) == count, (hex(start), val, hits); RS.extend((start + k, kind) for k in hits)

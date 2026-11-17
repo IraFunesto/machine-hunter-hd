@@ -236,8 +236,8 @@ static void ho_quad(float x0, float y0, float x1, float y1) { glBegin(GL_QUADS);
 static void hold_overlay(int cw, int ch)
 {
     int px = ch / 22; if (px < 14) px = 14; if (ho_px != px) { ho_str[0][0] = ho_str[1][0] = 0; }
-    char s[64]; sprintf(s, "CARICAMENTO TEXTURE HD  %d%%", nr_hold_pct);
-    ho_text(0, s, px); ho_text(1, "PREMI  X  PER INIZIARE", px); ho_px = px;
+    char s[64]; sprintf(s, mh_en() ? "LOADING HD TEXTURES  %d%%" : "CARICAMENTO TEXTURE HD  %d%%", nr_hold_pct);
+    ho_text(0, s, px); ho_text(1, mh_en() ? "PRESS  X  TO START" : "PREMI  X  PER INIZIARE", px); ho_px = px;
     p_glActiveTexture(GL_TEXTURE0);
     glViewport(0, 0, cw, ch); glMatrixMode(GL_PROJECTION); glLoadIdentity(); glOrtho(0, cw, ch, 0, -1, 1); glMatrixMode(GL_MODELVIEW); glLoadIdentity();
     glDisable(GL_DEPTH_TEST); glDisable(GL_CULL_FACE); glEnable(GL_BLEND); glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); glDisable(GL_TEXTURE_2D);

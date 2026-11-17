@@ -367,6 +367,16 @@ static int __cdecl rast_hook(void *poly, int c)
 /* telecamera libera (foto delle missioni): 0x420fb0 chiama 0x401e2e -> 0x413ea0(telecamera 0x4b1930, record giocatore).
    Con cam_ovr la telecamera riceve una posizione finta e si aggancia subito (campo +0x40); il giocatore resta dov'e'. */
 static volatile int cam_ovr, cam_x, cam_y, cam_z, cam_ang = -1, cam_yaw_set = -1, cam_mode;   /* cam_mode: 0 come nel gioco, 1 ruota col giocatore, 2 fissa */   /* cam_yaw_set: rotazione della modalita' foto (inclinazione invariata) */
+/* versione inglese dell'EXE (stessa 1.10, compilata dopo): quasi tutto agli stessi indirizzi, ma alcune funzioni sono state spostate.
+   ita(va) -> indirizzo nella versione in uso. Riconosciuta dal thunk 0x4024ff (IA) che porta a 0x4209f0 invece di 0x406070. */
+static int mh_lang = -1;   /* 0 italiano, 1 inglese */
+static int mh_en(void) { if (mh_lang < 0) mh_lang = *(BYTE*)0x4024ff == 0xE9 && (DWORD)(0x4024ff + 5 + *(int*)(0x4024ff + 1)) == 0x4209f0; return mh_lang; }
+static DWORD ita(DWORD va)
+{
+    static const DWORD m[][2] = { { 0x413ea0, 0x420fb0 }, { 0x420e00, 0x420f30 }, { 0x406070, 0x4209f0 } };
+    if (mh_en()) for (int i = 0; i < 3; i++) if (m[i][0] == va) return m[i][1];
+    return va;
+}
 typedef void (__cdecl *cam_t)(BYTE*, const BYTE*);
 static void __cdecl cam_hook(BYTE *cam, const BYTE *pos)
 {
@@ -376,9 +386,9 @@ static void __cdecl cam_hook(BYTE *cam, const BYTE *pos)
         ((int*)fake)[0] = cam_x; ((int*)fake)[1] = cam_y; ((int*)fake)[2] = cam_z;
         *(int*)(cam + 0x40) = 1;
         if (cam_ang >= 0) *(volatile int*)0x4b164c = cam_ang;
-        ((cam_t)0x413ea0)(cam, fake); return;
+        ((cam_t)ita(0x413ea0))(cam, fake); return;
     }
-    ((cam_t)0x413ea0)(cam, pos);
+    ((cam_t)ita(0x413ea0))(cam, pos);
 }
 typedef void (__cdecl *cam2_t)(BYTE*, const BYTE*, int);
 static void __cdecl cam2_hook(BYTE *cam, const BYTE *pos, int arg)
@@ -392,11 +402,11 @@ static void __cdecl cam2_hook(BYTE *cam, const BYTE *pos, int arg)
         if (cam_mode == 1) arg &= ~1;   /* telecamera che ruota col giocatore */
         if (cam_mode == 2) arg |= 1;                                                                   /* telecamera fissa */
         if (cam_yaw_set >= 0 && !(arg & 1)) *(int*)(fake + 0x258) = cam_yaw_set;   /* rotazione manuale anche con la telecamera che ruota */
-        ((cam2_t)0x420e00)(cam, fake, arg);
+        ((cam2_t)ita(0x420e00))(cam, fake, arg);
         if (cam_yaw_set >= 0 && (arg & 1)) *(int*)(cam + 0x14) = ((cam_yaw_set + 512) & 2047) << 16;
         return;
     }
-    ((cam2_t)0x420e00)(cam, pos, arg);
+    ((cam2_t)ita(0x420e00))(cam, pos, arg);
 }
 static volatile int ghost_player;   /* modalita' foto: il giocatore non viene disegnato */
 typedef void (__cdecl *actor_t)(BYTE*, BYTE*, int);
@@ -712,7 +722,7 @@ static void __cdecl txt_hook(void)
         }
     }
     {   /* "CONFERMA" fra i caratteri a schermo -> un menu aspetta CTRL (vedi pad_keys) */
-        static const char w[] = "CONFERMA"; int k = 0;
+        const char *w = mh_en() ? "CONTROLCONFIRMS" : "CONFERMA"; int k = 0;   /* spazi saltati */
         for (BYTE *n = *(BYTE**)0x6b65b8; n; n = *(BYTE**)n) { char ch = (char)n[0x14]; if (ch == ' ') continue; k = ch == w[k] ? k + 1 : (ch == w[0] ? 1 : 0); if (!w[k]) { menu_conf_t = GetTickCount(); break; } }
     }
     txt_on = 1; ((txt_t)0x44f6d0)(); txt_on = 0;
@@ -739,26 +749,28 @@ static void fix_small_font(void)
         VirtualProtect(tb, 512, old, &old);
     }
     /* testi tipo 5/6: avanzamento "larghezza - 3" (lettere sovrapposte) -> larghezza, sia nel disegno sia nel calcolo per centrare */
-    static const DWORD at[2] = { 0x44faba, 0x404efa }; static const BYTE ex[2][4] = { {0x8d,0x6c,0x15,0xfd}, {0x8d,0x44,0x08,0xfd} };
-    for (int i = 0; i < 2; i++) if (!memcmp((void*)at[i], ex[i], 4)) { VirtualProtect((void*)at[i], 4, PAGE_EXECUTE_READWRITE, &old); ((BYTE*)at[i])[3] = 0; VirtualProtect((void*)at[i], 4, old, &old); }
+    static const DWORD at[5] = { 0x44faba, 0x404efa, 0x44fa9d, 0x44facf, 0x44f419 };
+    static const BYTE ex[5][4] = { {0x8d,0x6c,0x15,0xfd}, {0x8d,0x44,0x08,0xfd}, {0x8d,0x6c,0x0d,0xfe}, {0x8d,0x6c,0x0d,0xfe}, {0x8d,0x44,0x08,0xfe} };
+    for (int i = 0; i < 5; i++) if (!memcmp((void*)at[i], ex[i], 4)) { VirtualProtect((void*)at[i], 4, PAGE_EXECUTE_READWRITE, &old); ((BYTE*)at[i])[3] = 0; VirtualProtect((void*)at[i], 4, old, &old); }
     FlushInstructionCache(GetCurrentProcess(), NULL, 0);
     mhlog("font piccolo: %d caratteri con spaziatura corretta", n);
 }
 static void srcmap_install(void)
 {
+    mh_en();   /* lingua dell'EXE: letta prima che i thunk vengano agganciati */
     if (*(BYTE*)0x40210d != 0xE9 || *(BYTE*)0x4014e2 != 0xE9) return;
     if ((DWORD)(0x40210d + 5 + *(int*)(0x40210d+1)) != 0x437c40 || (DWORD)(0x4014e2 + 5 + *(int*)(0x4014e2+1)) != 0x4432d0) return;
     if (*(BYTE*)0x4011c2 == 0xE9 && (DWORD)(0x4011c2 + 5 + *(int*)(0x4011c2+1)) == 0x44f6d0) patch_tramp(0x4011c2, (void*)txt_hook);
     if (*(BYTE*)0x401e3d == 0xE9 && (DWORD)(0x401e3d + 5 + *(int*)(0x401e3d + 1)) == 0x443880) patch_tramp(0x401e3d, (void*)g6_hook);
     fix_small_font();
     if (*(BYTE*)0x40215d == 0xE9 && (DWORD)(0x40215d + 5 + *(int*)(0x40215d+1)) == 0x441d80) patch_tramp(0x40215d, (void*)rast_hook);
-    if (*(BYTE*)0x401e2e == 0xE9 && (DWORD)(0x401e2e + 5 + *(int*)(0x401e2e + 1)) == 0x413ea0) patch_tramp(0x401e2e, (void*)cam_hook);
-    if (*(BYTE*)0x401afa == 0xE9 && (DWORD)(0x401afa + 5 + *(int*)(0x401afa + 1)) == 0x420e00) patch_tramp(0x401afa, (void*)cam2_hook);
+    if (*(BYTE*)0x401e2e == 0xE9 && (DWORD)(0x401e2e + 5 + *(int*)(0x401e2e + 1)) == ita(0x413ea0)) patch_tramp(0x401e2e, (void*)cam_hook);
+    if (*(BYTE*)0x401afa == 0xE9 && (DWORD)(0x401afa + 5 + *(int*)(0x401afa + 1)) == ita(0x420e00)) patch_tramp(0x401afa, (void*)cam2_hook);
     if (*(BYTE*)0x4028d8 == 0xE9) { actor_orig = 0x4028d8 + 5 + *(int*)(0x4028d8 + 1); patch_tramp(0x4028d8, (void*)actor_hook); }
     if (*(BYTE*)0x402a86 == 0xE9) { pick_orig = 0x402a86 + 5 + *(int*)(0x402a86 + 1); if (pick_orig == 0x446b90) patch_tramp(0x402a86, (void*)pick_hook); }
     if (*(BYTE*)0x4010b9 == 0xE9) { cellf_orig = 0x4010b9 + 5 + *(int*)(0x4010b9 + 1); if (cellf_orig == 0x44d3b0) patch_tramp(0x4010b9, (void*)cellf_hook); }
     ai_fix = GetPrivateProfileIntA("video", "ia_ostacoli", 1, ini_path);
-    if (*(BYTE*)0x4024ff == 0xE9) { ahead_orig = 0x4024ff + 5 + *(int*)(0x4024ff + 1); if (ahead_orig == 0x406070) patch_tramp(0x4024ff, (void*)ahead_hook); }
+    if (*(BYTE*)0x4024ff == 0xE9) { ahead_orig = 0x4024ff + 5 + *(int*)(0x4024ff + 1); if (ahead_orig == ita(0x406070)) patch_tramp(0x4024ff, (void*)ahead_hook); }
     if (*(BYTE*)0x4027a2 == 0xE9) { patrol_orig = 0x4027a2 + 5 + *(int*)(0x4027a2 + 1); if (patrol_orig == 0x405c70) patch_tramp(0x4027a2, (void*)patrol_hook); }
     for (int i = 0; i < 12; i++) if (*(BYTE*)rz_thunk[i] == 0xE9) { rz_orig[i] = rz_thunk[i] + 5 + *(int*)(rz_thunk[i] + 1); patch_tramp(rz_thunk[i], (void*)rz_hook[i]); }
     {   /* mappa (Select/TAB): centro = meta' della larghezza del livello 2D (854 a 32:9), ma il livello dei menu e' gia' spostato

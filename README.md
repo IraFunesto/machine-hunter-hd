@@ -11,7 +11,7 @@ Mod non ufficiale per **Machine Hunter** (PC, 1997, versione 1.10): alta risoluz
 
 > Il repository contiene **solo il codice e gli strumenti del mod**. Non contiene file del gioco originale, né musica, né texture. Ognuno si genera le texture HD, i menu HD e la musica dalla **propria copia** del gioco con `tools\installa.py`.
 
-> ⚠️ **Compatibilità:** il mod è stato provato **solo con la versione italiana** del gioco (`MACHHUNT.EXE` v1.10, MD5 `e651c3d6a3658aa47fc647621876acae`). Non si sa se funziona con altre versioni o lingue. `installa.py` controlla l'EXE e si ferma se non corrisponde nei punti da modificare.
+> ⚠️ **Compatibilità:** il mod è stato provato con la versione **italiana** e quella **inglese** del gioco (`MACHHUNT.EXE` v1.10; MD5 italiana `e651c3d6a3658aa47fc647621876acae`, inglese `a1f47a8ca1aa627081a53b33b9d861db`). Altre versioni o lingue non sono state provate. `installa.py` riconosce la versione e si ferma se l'EXE non corrisponde nei punti da modificare.
 
 ### Cosa fa
 
@@ -74,7 +74,8 @@ Serve il gioco **Machine Hunter** installato dal CD originale: cartella con `MAC
 
    Ci vogliono circa 15-20 minuti, soprattutto per Real-ESRGAN, e circa 1,5 GB di spazio.
 5. Metti `WINMX.dll` (dalla [release](../../releases), oppure compilala, vedi sotto) nella cartella del gioco.
-6. Avvia **`MACHHUNT_HD.EXE`**. Nella finestra "Machine Hunter V 1.10" premi *Nuova partita*.
+6. Facoltativo: scarica `anteprime_missioni.zip` dalla [release](../../releases) ed estrailo nella cartella del gioco. Sono le immagini delle 17 missioni rifatte in HD con foto in gioco (cartella `UI_HD\`); senza, si vedono quelle originali ingrandite.
+7. Avvia **`MACHHUNT_HD.EXE`**. Nella finestra "Machine Hunter V 1.10" premi *Nuova partita* (*New Game* nella versione inglese).
 
 `installa.py` esegue in ordine:
 1. EXE senza CD;
@@ -135,7 +136,7 @@ Unofficial mod for **Machine Hunter** (PC, 1997, version 1.10): high resolution,
 
 > This repository contains **only the mod's code and tools**. It contains no original game files, music or textures. Everyone generates the HD textures, HD menus and music from **their own copy** of the game with `tools\installa.py`.
 
-> ⚠️ **Compatibility:** the mod has been tested **only with the Italian version** of the game (`MACHHUNT.EXE` v1.10, MD5 `e651c3d6a3658aa47fc647621876acae`). Other versions and languages are untested. `installa.py` checks the EXE and stops if it doesn't match at the patched locations.
+> ⚠️ **Compatibility:** the mod has been tested with the **Italian** and **English** versions of the game (`MACHHUNT.EXE` v1.10; Italian MD5 `e651c3d6a3658aa47fc647621876acae`, English `a1f47a8ca1aa627081a53b33b9d861db`). Other versions and languages are untested. `installa.py` detects the version and stops if the EXE doesn't match at the patched locations.
 
 ### Features
 
@@ -198,7 +199,8 @@ You need **Machine Hunter** installed from the original CD: a folder with `MACHH
 
    It takes about 15-20 minutes, mostly for Real-ESRGAN, and about 1.5 GB of disk space.
 5. Put `WINMX.dll` (from the [release](../../releases), or build it, see below) in the game folder.
-6. Start **`MACHHUNT_HD.EXE`**. In the "Machine Hunter V 1.10" window, press *Nuova partita* (New game).
+6. Optional: download `anteprime_missioni.zip` from the [release](../../releases) and extract it into the game folder. It contains the 17 mission images remade in HD from in-game photos (`UI_HD\` folder); without it you get the original images upscaled.
+7. Start **`MACHHUNT_HD.EXE`**. In the "Machine Hunter V 1.10" window, press *New Game*.
 
 `installa.py` runs, in order:
 1. no-CD EXE;
