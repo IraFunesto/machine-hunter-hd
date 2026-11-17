@@ -11,7 +11,7 @@ Parte da MACHHUNT_NOCD4.EXE (gia' senza CD e senza filmati). Richiede: pefile, k
 import sys, os, struct
 import pefile, keystone, capstone
 
-HERE = os.path.dirname(os.path.abspath(__file__)); GAME = os.path.dirname(HERE)
+HERE = os.environ.get('MH_TOOLS') or os.path.dirname(os.path.abspath(__file__)); GAME = os.environ.get('MH_GAME') or os.path.dirname(HERE)
 SRC = os.environ.get('MH_SRC', os.path.join(GAME, 'MACHHUNT_NOCD4.EXE'))
 SPRHD = '--sprites' in sys.argv; args = [a for a in sys.argv[1:] if not a.startswith('--')]
 R = int(args[0]); T = int(args[1]); BW = int(args[2]) if len(args) > 2 else 560

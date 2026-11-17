@@ -15,7 +15,7 @@ import os, struct, shutil
 import numpy as np
 from PIL import Image
 
-GAME = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+GAME = os.environ.get('MH_GAME') or os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 UI = os.path.join(GAME, 'UI_HD')
 def bands(x0, y0, x1, y1, step): return [(x0, y, x1, y + step) for y in range(y0, y1, step)]
 # ogni riga di caratteri e' elaborata da sola: niente sbavature dalla riga sopra/sotto

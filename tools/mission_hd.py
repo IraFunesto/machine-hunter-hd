@@ -13,7 +13,7 @@ import numpy as np
 from PIL import Image
 from scipy.signal import fftconvolve
 
-GAME = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+GAME = os.environ.get('MH_GAME') or os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 UI = os.path.join(GAME, 'UI_HD'); FOTO = os.path.join(GAME, 'FOTO')
 MISSIONS = ['ACITY', 'ASTER', 'BARRACKS', 'BOSS3', 'COMPOUND', 'DOCKS', 'HOSP', 'JUNK', 'LABS', 'MARS',
             'MINES', 'NEST', 'POWER', 'ROOFTOPS', 'SEWER', 'STREETS', 'SWAMP']

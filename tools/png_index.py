@@ -9,7 +9,7 @@ Impronta: somma su i di byte[i] * w[i] (mod 2^64), con w[i] = LCG 64 bit (w0 = 0
 piu' la lunghezza * 0x100000001B3."""
 import os, sys, json, struct
 import numpy as np
-HERE = os.path.dirname(os.path.abspath(__file__)); GAME = os.path.dirname(HERE)
+HERE = os.environ.get('MH_TOOLS') or os.path.dirname(os.path.abspath(__file__)); GAME = os.environ.get('MH_GAME') or os.path.dirname(HERE)
 sys.path.insert(0, HERE)
 import mh_tex as m
 

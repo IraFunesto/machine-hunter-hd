@@ -55,6 +55,24 @@ Tutte le opzioni sono in `MHFIX.INI`, commentate.
 
 Serve il gioco **Machine Hunter** installato dal CD originale: cartella con `MACHHUNT.EXE` (v1.10) e `DATA\DATA.ARC`.
 
+#### Metodo semplice (senza Python)
+
+1. Scarica **`MachineHunterHD.zip`** dalla [release](../../releases) ed estrai **tutto** nella cartella del gioco. Dentro ci sono:
+   - il launcher `MachineHunterHD.exe`;
+   - `WINMX.dll` e `MHFIX.INI`;
+   - Real-ESRGAN, già pronto in `tools\realesrgan\`.
+2. Apri **`MachineHunterHD.exe`**. Riconosce la versione del gioco. Se vuoi la musica, scegli il lettore con il CD inserito.
+3. Premi **Installa**: ci vogliono circa 15-20 minuti e circa 1,5 GB di spazio.
+4. Facoltativo: estrai anche `anteprime_missioni.zip` nella cartella del gioco.
+5. Premi **Gioca**. Nella finestra "Machine Hunter V 1.10" premi *Nuova partita* (*New Game*).
+
+Note:
+- Il launcher la prima volta impiega qualche secondo ad aprirsi.
+- Windows potrebbe avvisare che il programma non è firmato. È normale per un EXE creato con PyInstaller, e il codice è tutto in questo repository.
+- Musica: se non si sente, attivala nelle opzioni del gioco (è un'impostazione del gioco, in `MACHHUNT.INI`). Gli EXE già modificati da altri per giocare senza CD vengono corretti da soli, perché alcuni bloccano la musica.
+
+#### Metodo con Python
+
 1. **Python 3.10+** e i pacchetti:
    ```bash
    pip install -r tools/requirements.txt
@@ -113,6 +131,7 @@ i686-w64-mingw32-clang -O2 -shared -o WINMX.dll winmx.c -lsetupapi -lhid -lgdi32
 | `tools/font_hd.py`, `make_logo.py`, `door_wide.py` | caratteri HD, logo, porte del menu larghe |
 | `tools/mission_hd.py` | immagini delle missioni dalle proprie foto in gioco (facoltativo) |
 | `tools/installa.py` | tutto in un comando |
+| `tools/launcher.py`, `make_launcher.py` | il launcher con finestra e il pacchetto senza Python (PyInstaller) |
 | `MHFIX.INI` | impostazioni del mod |
 
 ### Note
@@ -180,6 +199,24 @@ All options are in `MHFIX.INI`, with comments (in Italian).
 
 You need **Machine Hunter** installed from the original CD: a folder with `MACHHUNT.EXE` (v1.10) and `DATA\DATA.ARC`.
 
+#### Easy way (no Python needed)
+
+1. Download **`MachineHunterHD.zip`** from the [release](../../releases) and extract **everything** into the game folder. It contains:
+   - the launcher `MachineHunterHD.exe`;
+   - `WINMX.dll` and `MHFIX.INI`;
+   - Real-ESRGAN, ready in `tools\realesrgan\`.
+2. Open **`MachineHunterHD.exe`**. It detects the game version. For music, pick the drive with the CD in it.
+3. Press **Install**: it takes about 15-20 minutes and about 1.5 GB of space.
+4. Optional: also extract `anteprime_missioni.zip` into the game folder.
+5. Press **Play**. In the "Machine Hunter V 1.10" window press *New Game*.
+
+Notes:
+- The first time, the launcher takes a few seconds to open.
+- Windows may warn that the program is unsigned. That is normal for an EXE made with PyInstaller, and all the code is in this repository.
+- Music: if you can't hear it, turn it on in the game's options (it's a game setting, stored in `MACHHUNT.INI`). EXEs already modified by others to run without the CD are fixed automatically, because some of them block the music.
+
+#### With Python
+
 1. **Python 3.10+** and the packages:
    ```bash
    pip install -r tools/requirements.txt
@@ -238,6 +275,7 @@ i686-w64-mingw32-clang -O2 -shared -o WINMX.dll winmx.c -lsetupapi -lhid -lgdi32
 | `tools/font_hd.py`, `make_logo.py`, `door_wide.py` | HD fonts, logo, wide menu doors |
 | `tools/mission_hd.py` | mission images from your own in-game photos (optional) |
 | `tools/installa.py` | everything in one command |
+| `tools/launcher.py`, `make_launcher.py` | the windowed launcher and the no-Python package (PyInstaller) |
 | `MHFIX.INI` | mod settings |
 
 ### Notes

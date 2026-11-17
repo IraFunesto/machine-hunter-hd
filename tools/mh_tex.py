@@ -22,7 +22,7 @@ import numpy as np
 from PIL import Image
 from earc import rnc1, entries
 
-HERE = os.path.dirname(os.path.abspath(__file__)); GAME = os.path.dirname(HERE)
+HERE = os.environ.get('MH_TOOLS') or os.path.dirname(os.path.abspath(__file__)); GAME = os.environ.get('MH_GAME') or os.path.dirname(HERE)
 DATA = os.path.join(GAME, 'DATA')
 ARC = os.environ.get('MH_ARC', os.path.join(DATA, 'DATA.ARC')); ORIG = ARC + '.orig'
 HD2X = os.path.join(os.path.dirname(ARC), 'HD2X.ARC')
@@ -191,7 +191,7 @@ def esrgan(scale=4, model='realesrgan-x4plus'):
                 big.save(os.path.join(tin, '%s_%03d_%02d.png' % (lvl, i, t)))
     print('upscale di', len(os.listdir(tin)), 'tessere con', model, '...')
     subprocess.run([exe, '-i', tin, '-o', tout, '-n', model, '-f', 'png'], check=True,
-                   stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                   stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, creationflags=0x08000000)
     for lvl, sizes in man.items():
         od = os.path.join(outdir, lvl); os.makedirs(od, exist_ok=True)
         for i, k in enumerate(sizes):
@@ -239,7 +239,7 @@ def esrgan_fix(scale=4, model='realesrgan-x4plus', soglia=0.55, dry=False, rifai
     if dry or not todo: shutil.rmtree(tmp, ignore_errors=True); return todo
     for f in os.listdir(tin):
         if f.endswith('.json'): os.replace(os.path.join(tin, f), os.path.join(tmp, f))
-    subprocess.run([exe, '-i', tin, '-o', tout, '-n', model, '-f', 'png'], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    subprocess.run([exe, '-i', tin, '-o', tout, '-n', model, '-f', 'png'], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, creationflags=0x08000000)
     for lvl, i, k in todo:
         m, g = json.load(open(os.path.join(tmp, '%s_%03d.json' % (lvl, i)))); m = np.array(m, np.float32)
         n = 64//k; K = k*scale; out = Image.new('RGB', (64*scale, 64*scale))
@@ -339,7 +339,7 @@ def sprite_esrgan():
             Image.fromarray(rgb).save(os.path.join(tin, '%s__%03d.png' % (b, i)))
     print('upscale di', len(os.listdir(tin)), 'fotogrammi sprite ...')
     subprocess.run([exe, '-i', tin, '-o', tout, '-n', 'realesrgan-x4plus', '-f', 'png'], check=True,
-                   stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                   stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, creationflags=0x08000000)
     for b, codes in man.items():
         od = os.path.join(outdir, b); os.makedirs(od, exist_ok=True)
         for i in range(len(codes)):
@@ -387,7 +387,7 @@ def ui_hd(model='realesr-animevideov3'):
         im.save(os.path.join(tin, nm[:-4] + '.png'))
     print('upscale di', len(imgs), 'immagini dei menu ...')
     subprocess.run([exe, '-i', tin, '-o', tout, '-n', model, '-s', '4', '-f', 'png'], check=True,
-                   stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                   stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, creationflags=0x08000000)
     for nm, (w, h, idx, pal) in imgs.items():
         big = Image.open(os.path.join(tout, nm[:-4] + '.png')).convert('RGB')
         big = big.resize(((w+2*P)*4, (h+2*P)*4), Image.LANCZOS)          # 2x pixel -> x4 rete -> /2 = x4 finale

@@ -9,7 +9,7 @@ k32.CreateFileW.restype = wt.HANDLE
 IOCTL_CDROM_READ_TOC = 0x24000
 IOCTL_CDROM_RAW_READ = 0x2403E
 CDDA = 2
-GAME = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+GAME = os.environ.get('MH_GAME') or os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 def find_drive():
     for L in string.ascii_uppercase:

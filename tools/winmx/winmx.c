@@ -212,7 +212,7 @@ __declspec(dllexport) MCIERROR WINAPI mciSendStringA(LPCSTR cmd, LPSTR ret, UINT
     }
     if (strstr(c, "play")) {
         const char *f = strstr(c, "from");
-        if (f) { int from = atoi(f+4); music_play(from & 0xff, strstr(c, "notify") ? cb : NULL); }
+        if (f) { int from = atoi(f+4); mhlog("musica: il gioco chiede la traccia %d (\"%s\")", from & 0xff, cmd); music_play(from & 0xff, strstr(c, "notify") ? cb : NULL); }
         else if (music_open && music_paused) { real_mci("resume mhmusic", NULL, 0, NULL); music_paused = 0; }
         return 0;
     }

@@ -10,7 +10,7 @@ largo quanto serve (16:9, 21:9...).
 import os, struct, random
 import numpy as np
 from PIL import Image
-HERE = os.path.dirname(os.path.abspath(__file__)); UI = os.path.join(os.path.dirname(HERE), 'UI_HD')
+HERE = os.environ.get('MH_TOOLS') or os.path.dirname(os.path.abspath(__file__)); UI = os.path.join(os.environ.get('MH_GAME') or os.path.dirname(HERE), 'UI_HD')
 WIDE = 854                       # 320 + (854 - 320): massimo, 32:9
 # per fasce di righe (pixel originali, estremi inclusi): (riga0, riga1, colonna0, colonna1) da ripetere a specchio;
 # dove non ci sono bulloni ne' bordi verticali l'intervallo e' largo (ripetizione meno visibile). sinistra, destra

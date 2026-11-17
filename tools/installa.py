@@ -14,32 +14,51 @@ Alla fine si avvia MACHHUNT_HD.EXE (WINMX.dll accanto, dalla release o compilata
 """
 import os, sys, hashlib, subprocess, time
 
-HERE = os.path.dirname(os.path.abspath(__file__)); GAME = os.path.dirname(HERE)
+SCRIPTS = os.path.dirname(os.path.abspath(__file__))   # dove sono gli script (dentro MachineHunterHD.exe se impacchettato)
+HERE = os.environ.get('MH_TOOLS') or SCRIPTS; GAME = os.environ.get('MH_GAME') or os.path.dirname(HERE)
+INPROC = getattr(sys, 'frozen', False)   # launcher senza Python installato: gli script girano dentro lo stesso processo
 EXE = os.path.join(GAME, 'MACHHUNT.EXE'); NOCD = os.path.join(GAME, 'MACHHUNT_NOCD4.EXE'); OUT = os.path.join(GAME, 'MACHHUNT_HD.EXE')
 EXE_MD5 = {'e651c3d6a3658aa47fc647621876acae': 'italiana 1.10', 'a1f47a8ca1aa627081a53b33b9d861db': 'inglese 1.10'}   # versioni provate
 # EXE senza CD e senza filmati obbligatori: 4 punti (offset nel file, byte originali, byte nuovi)
 NOCD_PATCH = [(0x247d0, '83ec08535556', 'b801000000c3'), (0x2c327, '7503', '9090'), (0x380c9, '75', 'eb'), (0x3b781, '75', 'eb')]
+# EXE gia' "senza CD" di terze parti (es. l'inglese a1f47a8c...): la funzione 0x40fea0 che apre il CD audio e ne controlla lo stato
+# e' sostituita da "flag = 1, ritorna" -> il gioco non apre mai il CD audio e non chiede la musica. Si rimettono i byte originali
+# (uguali nell'italiana): al CD ci pensa gia' il mod (build_exe.py + WINMX.dll che emula il CD audio con MUSIC\).
+UNCRACK = [(0xf2a0, 'b801000000a3bced4900c3', 'a1bced490081ec00010000')]
 ESRGAN = os.path.join(HERE, 'realesrgan', 'realesrgan-ncnn-vulkan.exe')
 
 def step(msg): print('\n=== ' + msg, flush=True)
 
 def run(*args):
-    t = time.time(); subprocess.run([sys.executable] + list(args), cwd=HERE, check=True)
-    print('    (%.0f s)' % (time.time() - t))
+    t = time.time()
+    if INPROC:
+        import runpy
+        old = sys.argv; sys.argv = [os.path.join(SCRIPTS, args[0])] + list(args[1:])
+        try: runpy.run_path(sys.argv[0], run_name='__main__')
+        except SystemExit as e:
+            if e.code not in (None, 0): raise subprocess.CalledProcessError(e.code if isinstance(e.code, int) else 1, args)
+        except Exception as e:
+            import traceback; traceback.print_exc(); raise subprocess.CalledProcessError(1, args)
+        finally: sys.argv = old
+    else:
+        subprocess.run([sys.executable] + list(args), cwd=HERE, check=True)
+    print('    (%.0f s)' % (time.time() - t), flush=True)
 
-def make_nocd():
-    if os.path.exists(NOCD): return
+def make_nocd():   # rifatto ogni volta (pochi byte): cosi' una reinstallazione prende anche le correzioni nuove
     b = bytearray(open(EXE, 'rb').read())
     v = EXE_MD5.get(hashlib.md5(b).hexdigest())
     print('MACHHUNT.EXE: versione ' + v if v else 'ATTENZIONE: MACHHUNT.EXE non e\' una versione provata (italiana o inglese 1.10); provo lo stesso')
+    for o, cracked, orig in UNCRACK:
+        if bytes(b[o:o+11]) == bytes.fromhex(cracked):
+            b[o:o+11] = bytes.fromhex(orig); print('ripristinata la funzione del CD audio a 0x%x (EXE gia\' modificato da altri: la musica non partiva)' % (o + 0x400c00))
     for o, old, new in NOCD_PATCH:
         old, new = bytes.fromhex(old), bytes.fromhex(new); cur = bytes(b[o:o+len(old)])
         if cur != old and cur != new: sys.exit('MACHHUNT.EXE diverso dall\'atteso a 0x%x: interrotto' % o)   # gia' modificato = va bene
         b[o:o+len(new)] = new
     open(NOCD, 'wb').write(b); print('scritto', NOCD)
 
-def main():
-    a = sys.argv[1:]
+def main(a=None):
+    a = sys.argv[1:] if a is None else a
     if not os.path.exists(EXE) or not os.path.exists(os.path.join(GAME, 'DATA', 'DATA.ARC')):
         sys.exit('Metti tools\\ nella cartella del gioco (servono MACHHUNT.EXE e DATA\\DATA.ARC).\n'
                  'Put tools\\ in the game folder (MACHHUNT.EXE and DATA\\DATA.ARC are needed).')
